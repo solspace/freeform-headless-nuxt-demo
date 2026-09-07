@@ -1,0 +1,6 @@
+/* Utilities only — demo chrome keeps its own CSS (no Tailwind preflight). */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@source "../../node_modules/@solspace/freeform-theme-tailwind";
+@source "../../node_modules/@solspace/freeform-theme-tailwind/dist/**/*.js";
