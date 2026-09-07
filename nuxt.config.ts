@@ -6,6 +6,15 @@ import { defineNuxtConfig } from "nuxt/config";
 import { loadEnv } from "vite";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
+const themeClassNames = (pkg: string) =>
+  path.join(
+    rootDir,
+    "node_modules",
+    "@solspace",
+    pkg,
+    "dist",
+    "classNames.js",
+  );
 
 // Load `.env` before reading port — shell `PORT=3000` from other demos must not win.
 const fileEnv = loadEnv("development", rootDir, "");
@@ -32,6 +41,15 @@ function rewriteCraftCookies(proxyRes: {
       .replace(/;?\s*Secure/gi, ""),
   );
 }
+
+const classNameAliases = {
+  "#freeform-theme-tailwind-classnames": themeClassNames(
+    "freeform-theme-tailwind",
+  ),
+  "#freeform-theme-bootstrap-classnames": themeClassNames(
+    "freeform-theme-bootstrap",
+  ),
+} as const;
 
 export default defineNuxtConfig({
   compatibilityDate: "2025-01-01",
@@ -60,18 +78,20 @@ export default defineNuxtConfig({
         "",
     },
   },
+  // Class maps only — never the theme package main entry (that pulls React).
+  alias: { ...classNameAliases },
   build: {
     transpile: [
       "@solspace/freeform-core",
       "@solspace/freeform-vue",
       "@solspace/freeform-extensions",
-      "@solspace/freeform-theme-default",
-      "@solspace/freeform-theme-tailwind",
-      "@solspace/freeform-theme-bootstrap",
     ],
   },
   vite: {
     plugins: [vueJsx(), tailwindcss()],
+    resolve: {
+      alias: { ...classNameAliases },
+    },
     server: {
       port,
       strictPort: true,

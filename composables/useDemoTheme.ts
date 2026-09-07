@@ -1,48 +1,71 @@
 import { computed, onMounted, onUnmounted, ref, watch, type Ref } from "vue";
+import { createTheme, defaultTheme, type FreeformVueTheme } from "@solspace/freeform-vue";
 import {
-  darkTheme,
-  lightTheme,
-  systemTheme,
-} from "@solspace/freeform-theme-default";
+  darkClassNames as twDark,
+  darkClassNamesByType as twDarkByType,
+  lightClassNames as twLight,
+  lightClassNamesByType as twLightByType,
+} from "#freeform-theme-tailwind-classnames";
 import {
-  bootstrapDarkTheme,
-  bootstrapTheme,
-} from "@solspace/freeform-theme-bootstrap";
-import {
-  tailwindDarkTheme,
-  tailwindTheme,
-} from "@solspace/freeform-theme-tailwind";
-import type { FreeformVueTheme } from "@solspace/freeform-vue";
+  darkClassNames as bsDark,
+  darkClassNamesByType as bsDarkByType,
+  lightClassNames as bsLight,
+  lightClassNamesByType as bsLightByType,
+} from "#freeform-theme-bootstrap-classnames";
 
 export type ColorScheme = "light" | "dark" | "system";
 export type ThemeSkin = "default" | "tailwind" | "bootstrap";
 
 /**
- * Theme packages currently export React themes. For Vue we keep classNames /
- * defaults and drop React renderer components (e.g. Bootstrap Form wrappers).
+ * Theme npm packages currently peer on `@solspace/freeform-react` and their
+ * main entry imports React. Nuxt only needs the class maps — we import
+ * `dist/classNames.js` via aliases and assemble Vue themes with createTheme().
  */
-function toVueTheme(theme: {
-  name: string;
-  classNameStrategy?: FreeformVueTheme["classNameStrategy"];
-  classNames?: FreeformVueTheme["classNames"];
-  classNamesByType?: FreeformVueTheme["classNamesByType"];
-  defaults?: FreeformVueTheme["defaults"];
-}): FreeformVueTheme {
-  return {
-    name: theme.name,
-    framework: "vue",
-    classNameStrategy: theme.classNameStrategy,
-    classNames: theme.classNames,
-    classNamesByType: theme.classNamesByType,
-    defaults: theme.defaults,
-  };
+function skinTheme(
+  name: string,
+  classNames: FreeformVueTheme["classNames"],
+  classNamesByType: FreeformVueTheme["classNamesByType"],
+  colorScheme: "light" | "dark",
+): FreeformVueTheme {
+  return createTheme({
+    name,
+    classNameStrategy: "replace",
+    classNames,
+    classNamesByType,
+    defaults: { colorScheme },
+  });
 }
 
 const defaultThemesByScheme: Record<ColorScheme, FreeformVueTheme> = {
-  light: toVueTheme(lightTheme),
-  dark: toVueTheme(darkTheme),
-  system: toVueTheme(systemTheme),
+  light: createTheme({ defaults: { colorScheme: "light" } }),
+  dark: createTheme({ defaults: { colorScheme: "dark" } }),
+  system: defaultTheme,
 };
+
+const tailwindLight = skinTheme(
+  "tailwind",
+  twLight,
+  twLightByType(),
+  "light",
+);
+const tailwindDark = skinTheme(
+  "tailwind-dark",
+  twDark,
+  twDarkByType(),
+  "dark",
+);
+const bootstrapLight = skinTheme(
+  "bootstrap",
+  bsLight,
+  bsLightByType(),
+  "light",
+);
+const bootstrapDark = skinTheme(
+  "bootstrap-dark",
+  bsDark,
+  bsDarkByType(),
+  "dark",
+);
 
 export function useDemoTheme(
   colorScheme: Ref<ColorScheme>,
@@ -83,11 +106,11 @@ export function useDemoTheme(
       (colorScheme.value === "system" && prefersDark.value);
 
     if (themeSkin.value === "tailwind") {
-      return toVueTheme(useDark ? tailwindDarkTheme : tailwindTheme);
+      return useDark ? tailwindDark : tailwindLight;
     }
 
     if (themeSkin.value === "bootstrap") {
-      return toVueTheme(useDark ? bootstrapDarkTheme : bootstrapTheme);
+      return useDark ? bootstrapDark : bootstrapLight;
     }
 
     return defaultThemesByScheme[colorScheme.value];

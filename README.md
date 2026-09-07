@@ -37,6 +37,8 @@ Uses published `@solspace/freeform-*` packages from npm (`^0.1.19`).
 
 This is an **SPA** (`ssr: false`) — Freeform mounts in the browser only (same idea as Next.js Client Components).
 
+**No React.** Theme package main entries currently depend on `@solspace/freeform-react`, so this demo never imports those entries. It loads `dist/classNames.js` only (via Nuxt aliases) and builds Vue themes with `createTheme()` from `@solspace/freeform-vue`.
+
 ## Configure Craft
 
 Requires a Craft site with Freeform headless enabled. Nuxt proxies `/freeform` and `/actions` to `CRAFT_PROXY_TARGET`.
