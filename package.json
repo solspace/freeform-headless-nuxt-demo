@@ -1,7 +1,7 @@
 {
   "name": "@solspace/freeform-headless-nuxt-demo",
   "private": true,
-  "version": "0.1.20",
+  "version": "1.0.0",
   "type": "module",
   "description": "Example Nuxt app using @solspace/freeform-* from npm",
   "scripts": {
@@ -11,12 +11,12 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@solspace/freeform-core": "^0.1.20",
-    "@solspace/freeform-extensions": "^0.1.20",
-    "@solspace/freeform-vue": "^0.1.20",
-    "@solspace/freeform-theme-bootstrap": "^0.1.20",
-    "@solspace/freeform-theme-default": "^0.1.20",
-    "@solspace/freeform-theme-tailwind": "^0.1.20",
+    "@solspace/freeform-core": "^1.0.0",
+    "@solspace/freeform-extensions": "^1.0.0",
+    "@solspace/freeform-vue": "^1.0.0",
+    "@solspace/freeform-theme-bootstrap": "^1.0.0",
+    "@solspace/freeform-theme-default": "^1.0.0",
+    "@solspace/freeform-theme-tailwind": "^1.0.0",
     "bootstrap": "^5.3.7",
     "nuxt": "^3.16.2",
     "vue": "^3.5.22",

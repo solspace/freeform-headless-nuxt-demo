@@ -33,7 +33,7 @@ pnpm dev
 
 Open [http://127.0.0.1:3002](http://127.0.0.1:3002).
 
-Uses published `@solspace/freeform-*` packages from npm (`^0.1.20`).
+Uses published `@solspace/freeform-*` packages from npm (`^1.0.0`).
 
 This is an **SPA** (`ssr: false`) — Freeform mounts in the browser only (same idea as Next.js Client Components).
 
