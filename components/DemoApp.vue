@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import type { FreeformManifest, SubmitResponse } from "@solspace/freeform-core";
 import {
   type ColorScheme,
@@ -15,6 +15,12 @@ import {
 } from "../utils/draftUrl";
 import { graphqlFetch as rawGraphqlFetch } from "../utils/graphqlFetch";
 import { withFakerResolvedFetch } from "../utils/resolveFakerDefaults";
+import {
+  readStoredColorScheme,
+  readStoredThemeSkin,
+  writeStoredColorScheme,
+  writeStoredThemeSkin,
+} from "../utils/themePrefs";
 
 const graphqlFetch = withFakerResolvedFetch(rawGraphqlFetch);
 
@@ -24,16 +30,20 @@ import "@solspace/freeform-theme-bootstrap/styles.css";
 
 type ApiMode = "rest" | "graphql";
 type ViewMode = "component" | "headless" | "manifest";
+type StageLayout = "preview" | "code";
 
 const { defaultHandle, packageSource, hasGraphqlToken } = useDemoConfig();
+const config = useRuntimeConfig();
+const configuredBaseUrl = String(config.public.freeformBaseUrl || "");
 const initialDraft = readDraftFromUrl();
 
 const handleDraft = ref(defaultHandle);
 const handle = ref(defaultHandle);
 const apiMode = ref<ApiMode>("rest");
 const mode = ref<ViewMode>("component");
-const colorScheme = ref<ColorScheme>("system");
-const themeSkin = ref<ThemeSkin>("default");
+const stageLayout = ref<StageLayout>("preview");
+const colorScheme = ref<ColorScheme>(readStoredColorScheme("system"));
+const themeSkin = ref<ThemeSkin>(readStoredThemeSkin("default"));
 const lastSubmit = ref<SubmitResponse | null>(null);
 const manifestInfo = ref<string | null>(null);
 const draft = ref<DraftCredentials>(initialDraft);
@@ -44,6 +54,9 @@ const resumeUrl = ref<string | null>(
 );
 
 const { theme, bootstrapPreviewDark } = useDemoTheme(colorScheme, themeSkin);
+
+watch(colorScheme, (scheme) => writeStoredColorScheme(scheme));
+watch(themeSkin, (skin) => writeStoredThemeSkin(skin));
 
 const transportFetch = computed(() =>
   apiMode.value === "graphql" ? graphqlFetch : undefined,
@@ -62,6 +75,7 @@ const loadingMessage = computed(() =>
 
 const themeSkins = ["default", "tailwind", "bootstrap"] as const;
 const colorSchemes = ["light", "dark", "system"] as const;
+const githubRepo = "https://github.com/solspace/freeform-headless-nuxt-demo";
 const viewModes: { id: ViewMode; label: string }[] = [
   { id: "component", label: "<Freeform />" },
   { id: "headless", label: "useFreeform()" },
@@ -72,6 +86,12 @@ function themeSkinLabel(skin: ThemeSkin): string {
   if (skin === "default") return "Default";
   if (skin === "tailwind") return "Tailwind";
   return "Bootstrap";
+}
+
+function colorSchemeIcon(scheme: ColorScheme): "sun" | "moon" | "system" {
+  if (scheme === "light") return "sun";
+  if (scheme === "dark") return "moon";
+  return "system";
 }
 
 function colorSchemeLabel(scheme: ColorScheme): string {
@@ -182,18 +202,31 @@ function onManifestLoaded(manifest: FreeformManifest, via: "REST" | "GraphQL") {
               {{ themeSkinLabel(skin) }}
             </button>
           </div>
-          <div class="scheme-toggle" role="group" aria-label="Color scheme">
+          <div class="scheme-toggle scheme-toggle--icons" role="group" aria-label="Color scheme">
             <button
               v-for="scheme in colorSchemes"
               :key="scheme"
               type="button"
-              class="scheme-toggle__btn"
+              class="scheme-toggle__btn scheme-toggle__btn--icon"
               :class="{ 'is-active': colorScheme === scheme }"
+              :aria-label="colorSchemeLabel(scheme)"
+              :aria-pressed="colorScheme === scheme"
+              :title="colorSchemeLabel(scheme)"
               @click="colorScheme = scheme"
             >
-              {{ colorSchemeLabel(scheme) }}
+              <DemoIcon :name="colorSchemeIcon(scheme)" />
             </button>
           </div>
+          <a
+            class="header-github"
+            :href="githubRepo"
+            target="_blank"
+            rel="noreferrer"
+            title="View on GitHub"
+            aria-label="View on GitHub"
+          >
+            <DemoIcon name="github" />
+          </a>
         </div>
       </div>
       <p class="header-lead">
@@ -364,59 +397,110 @@ function onManifestLoaded(manifest: FreeformManifest, via: "REST" | "GraphQL") {
         </section>
       </aside>
 
-      <main class="demo-stage" aria-label="Form preview">
+      <main class="demo-stage" aria-label="Form stage">
         <div
           class="panel panel--stage"
           :class="{
             'panel--bootstrap-dark':
-              bootstrapPreviewDark && mode === 'component',
+              bootstrapPreviewDark &&
+              mode === 'component' &&
+              stageLayout === 'preview',
           }"
         >
-          <h2 class="panel-title">Form preview</h2>
+          <div v-if="mode !== 'manifest'" class="stage-header">
+            <div
+              class="view-picker view-picker--compact"
+              role="tablist"
+              aria-label="Stage layout"
+            >
+              <button
+                type="button"
+                role="tab"
+                :aria-selected="stageLayout === 'preview'"
+                class="view-picker__tab"
+                :class="{ 'is-active': stageLayout === 'preview' }"
+                @click="stageLayout = 'preview'"
+              >
+                Preview
+              </button>
+              <button
+                type="button"
+                role="tab"
+                :aria-selected="stageLayout === 'code'"
+                class="view-picker__tab"
+                :class="{ 'is-active': stageLayout === 'code' }"
+                @click="stageLayout = 'code'"
+              >
+                Code
+              </button>
+            </div>
+          </div>
 
-          <ComponentForm
-            v-if="mode === 'component'"
-            :key="componentFormKey"
-            embedded
-            :handle="handle"
-            :theme="theme"
-            :draft-token="draft.draftToken"
-            :draft-key="draft.draftKey"
-            :fetch-impl="transportFetch"
-            :preview-dark="bootstrapPreviewDark"
-            :loading-message="loadingMessage"
-            :form-key="componentFormKey"
-            @submit="handleSubmitResponse"
-          />
+          <template v-if="mode === 'manifest'">
+            <ManifestPanel
+              v-if="apiMode === 'rest'"
+              :key="`rest:${handle}`"
+              embedded
+              :handle="handle"
+              @loaded="(manifest) => onManifestLoaded(manifest, 'REST')"
+            />
+            <GraphqlManifestPanel
+              v-else
+              :key="`gql:${handle}`"
+              embedded
+              :handle="handle"
+              @loaded="(manifest) => onManifestLoaded(manifest, 'GraphQL')"
+            />
+          </template>
 
-          <HeadlessForm
-            v-if="mode === 'headless'"
-            :key="componentFormKey"
-            embedded
-            :handle="handle"
-            :draft-token="draft.draftToken"
-            :draft-key="draft.draftKey"
-            :fetch-impl="transportFetch"
-            @submit="handleSubmitResponse"
-          />
+          <div
+            v-else
+            class="stage-flip"
+            :class="stageLayout === 'code' ? 'is-code' : 'is-preview'"
+            :key="stageLayout"
+          >
+            <div v-if="stageLayout === 'preview'" class="stage-flip__face">
+              <ComponentForm
+                v-if="mode === 'component'"
+                :key="componentFormKey"
+                embedded
+                :handle="handle"
+                :theme="theme"
+                :draft-token="draft.draftToken"
+                :draft-key="draft.draftKey"
+                :fetch-impl="transportFetch"
+                :preview-dark="bootstrapPreviewDark"
+                :loading-message="loadingMessage"
+                :form-key="componentFormKey"
+                @submit="handleSubmitResponse"
+              />
 
-          <ManifestPanel
-            v-if="mode === 'manifest' && apiMode === 'rest'"
-            :key="`rest:${handle}`"
-            embedded
-            :handle="handle"
-            @loaded="(manifest) => onManifestLoaded(manifest, 'REST')"
-          />
+              <HeadlessForm
+                v-if="mode === 'headless'"
+                :key="componentFormKey"
+                embedded
+                :handle="handle"
+                :draft-token="draft.draftToken"
+                :draft-key="draft.draftKey"
+                :fetch-impl="transportFetch"
+                @submit="handleSubmitResponse"
+              />
+            </div>
 
-          <GraphqlManifestPanel
-            v-if="mode === 'manifest' && apiMode === 'graphql'"
-            :key="`gql:${handle}`"
-            embedded
-            :handle="handle"
-            @loaded="(manifest) => onManifestLoaded(manifest, 'GraphQL')"
-          />
+            <div v-else class="stage-flip__face">
+              <CodePreviewPanel
+                :handle="handle"
+                :api-mode="apiMode"
+                :theme-skin="themeSkin"
+                :configured-base-url="configuredBaseUrl"
+              />
+            </div>
+          </div>
 
-          <div v-if="lastSubmit" class="submit-feedback">
+          <div
+            v-if="lastSubmit && stageLayout === 'preview'"
+            class="submit-feedback"
+          >
             <div class="stage-divider" />
             <div
               class="status"

@@ -38,17 +38,6 @@ function onSubmit(response: SubmitResponse) {
   <div :class="{ 'panel--bootstrap-dark': previewDark && !embedded }">
     <h2 v-if="!embedded" class="panel-title">Form preview</h2>
 
-    <pre
-      v-if="fetchImpl"
-      class="panel-meta"
-      style="margin-bottom: 1rem"
-    >{{ `<Freeform
-  handle="${handle}"
-  :base-url="window.location.origin"
-  :fetch="graphqlFetch"
-  :extensions="recommendedExtensions"
-/>` }}</pre>
-
     <Freeform
       :key="formKey"
       :handle="handle"

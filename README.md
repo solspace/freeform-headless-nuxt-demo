@@ -11,6 +11,7 @@ Example **Nuxt 3** app that renders [Solspace Freeform](https://docs.solspace.co
 | Default / Tailwind / Bootstrap themes | Yes |
 | Light / Dark / System color scheme | Yes |
 | Save & Continue Later (draft URL) | Yes |
+| Stage Preview / Code (copy-paste starters) | Yes |
 
 Official packages:
 
