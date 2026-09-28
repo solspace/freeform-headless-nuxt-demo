@@ -61,6 +61,24 @@ export default defineNuxtConfig({
     // Avoid `#app-manifest` resolve errors with ssr:false + Vite.
     appManifest: false,
   },
+  app: {
+    head: {
+      title: "Freeform Headless Nuxt Demo · Solspace",
+      meta: [
+        {
+          name: "description",
+          content:
+            "Solspace Freeform headless Nuxt demo — REST & GraphQL forms with @solspace/freeform-* packages.",
+        },
+        { name: "theme-color", content: "#0f172a" },
+      ],
+      link: [
+        { rel: "icon", href: "/favicon.ico", sizes: "any" },
+        { rel: "icon", type: "image/png", href: "/solspace-icon.png" },
+        { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+      ],
+    },
+  },
   devtools: { enabled: false },
   css: ["~/assets/css/tailwind.css", "~/assets/css/styles.css"],
   runtimeConfig: {

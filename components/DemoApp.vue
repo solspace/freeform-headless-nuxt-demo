@@ -156,9 +156,18 @@ function onManifestLoaded(manifest: FreeformManifest, via: "REST" | "GraphQL") {
   <div class="app" :data-theme="colorScheme">
     <header class="app-header">
       <div class="header-row">
-        <h1>
-          Freeform Headless Nuxt Demo
-          <span class="package-source">{{ packageSource }}</span>
+        <h1 class="header-brand">
+          <img
+            class="header-brand__icon"
+            src="/solspace-icon.png"
+            alt=""
+            width="32"
+            height="32"
+          />
+          <span>
+            Freeform Headless Nuxt Demo
+            <span class="package-source">{{ packageSource }}</span>
+          </span>
         </h1>
         <div class="header-row__controls">
           <div class="scheme-toggle" role="group" aria-label="Form theme">
