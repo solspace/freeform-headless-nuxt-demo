@@ -6,7 +6,11 @@ import {
   useFreeform,
   type FreeformVueTheme,
 } from "@solspace/freeform-vue";
-import { baseUrl, demoExtensions } from "../composables/useDemoConfig";
+import { demoExtensions, useDemoConfig } from "../composables/useDemoConfig";
+import { withFakerResolvedFetch } from "../utils/resolveFakerDefaults";
+
+const demoFetch = withFakerResolvedFetch();
+const { baseUrl } = useDemoConfig();
 
 const props = withDefaults(
   defineProps<{
@@ -29,7 +33,7 @@ const emit = defineEmits<{
 const form = useFreeform(() => ({
   handle: props.handle,
   baseUrl,
-  fetch: props.fetchImpl,
+  fetch: props.fetchImpl ?? demoFetch,
   extensions: demoExtensions,
   draftToken: props.draftToken,
   draftKey: props.draftKey,

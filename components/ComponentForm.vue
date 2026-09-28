@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import type { SubmitResponse } from "@solspace/freeform-core";
 import { Freeform, type FreeformVueTheme } from "@solspace/freeform-vue";
-import { baseUrl, demoExtensions } from "../composables/useDemoConfig";
+import { demoExtensions, useDemoConfig } from "../composables/useDemoConfig";
+import { withFakerResolvedFetch } from "../utils/resolveFakerDefaults";
+
+const demoFetch = withFakerResolvedFetch();
+const { baseUrl } = useDemoConfig();
 
 const props = withDefaults(
   defineProps<{
@@ -49,7 +53,7 @@ function onSubmit(response: SubmitResponse) {
       :key="formKey"
       :handle="handle"
       :base-url="baseUrl"
-      :fetch="fetchImpl"
+      :fetch="fetchImpl ?? demoFetch"
       :theme="theme"
       :extensions="demoExtensions"
       :draft-token="draftToken"

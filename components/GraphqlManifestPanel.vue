@@ -6,6 +6,7 @@ import {
   craftGraphql,
   HEADLESS_MANIFEST_QUERY,
 } from "../utils/graphql";
+import { resolveManifestFakerDefaults } from "../utils/resolveFakerDefaults";
 
 const props = withDefaults(
   defineProps<{
@@ -33,8 +34,11 @@ async function loadManifest() {
     const data = await craftGraphql<{
       freeformHeadlessManifest: FreeformManifest;
     }>(HEADLESS_MANIFEST_QUERY, { handle: props.handle });
-    manifest.value = data.freeformHeadlessManifest;
-    emit("loaded", data.freeformHeadlessManifest);
+    const resolved = resolveManifestFakerDefaults(
+      data.freeformHeadlessManifest,
+    );
+    manifest.value = resolved;
+    emit("loaded", resolved);
   } catch (loadError) {
     error.value =
       loadError instanceof Error

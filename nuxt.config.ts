@@ -38,7 +38,9 @@ function rewriteCraftCookies(proxyRes: {
   proxyRes.headers["set-cookie"] = list.map((cookie) =>
     cookie
       .replace(/;?\s*Domain=[^;]+/gi, "")
-      .replace(/;?\s*Secure/gi, ""),
+      .replace(/;?\s*Secure/gi, "")
+      // SameSite=None requires Secure; demos run on http://localhost.
+      .replace(/;?\s*SameSite=None/gi, "; SameSite=Lax"),
   );
 }
 
@@ -67,6 +69,10 @@ export default defineNuxtConfig({
         fileEnv.NUXT_PUBLIC_FREEFORM_HANDLE ||
         process.env.NUXT_PUBLIC_FREEFORM_HANDLE ||
         "contact",
+      freeformBaseUrl:
+        fileEnv.NUXT_PUBLIC_FREEFORM_BASE_URL ||
+        process.env.NUXT_PUBLIC_FREEFORM_BASE_URL ||
+        "",
       freeformPackages: "npm",
       graphqlPath:
         fileEnv.NUXT_PUBLIC_GRAPHQL_PATH ||

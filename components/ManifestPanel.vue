@@ -5,7 +5,11 @@ import {
   type FreeformManifest,
 } from "@solspace/freeform-core";
 import { FormLoader } from "@solspace/freeform-vue";
-import { baseUrl, demoExtensions } from "../composables/useDemoConfig";
+import { demoExtensions, useDemoConfig } from "../composables/useDemoConfig";
+import { withFakerResolvedFetch } from "../utils/resolveFakerDefaults";
+
+const demoFetch = withFakerResolvedFetch();
+const { baseUrl } = useDemoConfig();
 
 const props = withDefaults(
   defineProps<{
@@ -25,7 +29,7 @@ const loading = ref(false);
 const error = ref<string | null>(null);
 const manifest = ref<FreeformManifest | null>(null);
 
-const client = createFreeformClient({ baseUrl });
+const client = createFreeformClient({ baseUrl, fetch: demoFetch });
 for (const extension of demoExtensions) {
   client.extensions.register(extension);
 }

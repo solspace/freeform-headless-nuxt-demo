@@ -1,5 +1,7 @@
 /** Craft GraphQL client for Freeform headless adapters. */
 
+import { resolveCraftBaseUrl, resolveGraphqlUrl } from "./craftUrl";
+
 export type GraphqlResponse<T> = {
   data?: T;
   errors?: Array<{ message: string }>;
@@ -14,6 +16,10 @@ export async function craftGraphql<T>(
     String(config.public.graphqlPath || "").trim() ||
     "/actions/graphql/api";
   const graphqlToken = String(config.public.graphqlToken || "").trim();
+  const baseUrl = resolveCraftBaseUrl(
+    String(config.public.freeformBaseUrl || ""),
+  );
+  const url = resolveGraphqlUrl(baseUrl, graphqlPath);
 
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -24,7 +30,7 @@ export async function craftGraphql<T>(
     headers.Authorization = `Bearer ${graphqlToken}`;
   }
 
-  const response = await fetch(graphqlPath, {
+  const response = await fetch(url, {
     method: "POST",
     headers,
     credentials: "include",
