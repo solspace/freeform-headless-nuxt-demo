@@ -26,6 +26,22 @@ const port = Number(
   fileEnv.NUXT_PORT || fileEnv.PORT || process.env.NUXT_PORT || 3002,
 );
 
+/** Public path behind Cloudflare: demo.solspace.com/freeform-headless/nuxt/ */
+const baseFromEnv = (
+  fileEnv.NUXT_APP_BASE_URL ||
+  process.env.NUXT_APP_BASE_URL ||
+  ""
+).trim();
+const appBaseURL = baseFromEnv
+  ? baseFromEnv.endsWith("/")
+    ? baseFromEnv
+    : `${baseFromEnv}/`
+  : process.env.NODE_ENV === "production" || process.env.VERCEL === "1"
+    ? "/freeform-headless/nuxt/"
+    : "/";
+
+console.warn(`[freeform-nuxt-demo] baseURL: ${appBaseURL}`);
+
 function rewriteCraftCookies(proxyRes: {
   headers: Record<string, string | string[] | undefined>;
 }) {
@@ -62,6 +78,7 @@ export default defineNuxtConfig({
     appManifest: false,
   },
   app: {
+    baseURL: appBaseURL,
     head: {
       title: "Freeform Headless Nuxt Demo · Solspace",
       meta: [
@@ -73,9 +90,16 @@ export default defineNuxtConfig({
         { name: "theme-color", content: "#0f172a" },
       ],
       link: [
-        { rel: "icon", href: "/favicon.ico", sizes: "any" },
-        { rel: "icon", type: "image/png", href: "/solspace-icon.png" },
-        { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+        { rel: "icon", href: `${appBaseURL}favicon.ico`.replace(/([^:]\/)\/+/g, "$1"), sizes: "any" },
+        {
+          rel: "icon",
+          type: "image/png",
+          href: `${appBaseURL}solspace-icon.png`.replace(/([^:]\/)\/+/g, "$1"),
+        },
+        {
+          rel: "apple-touch-icon",
+          href: `${appBaseURL}apple-touch-icon.png`.replace(/([^:]\/)\/+/g, "$1"),
+        },
       ],
     },
   },

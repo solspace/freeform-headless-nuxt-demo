@@ -46,6 +46,8 @@ Requires a Craft site with Freeform headless enabled. Nuxt proxies `/freeform` a
 
 See the [React demo README](https://github.com/solspace/freeform-headless-react-demo/blob/main/README.md) for full Craft setup steps, or [Headless → Nuxt](https://docs.solspace.com/craft/freeform/v5/headless/nuxt/).
 
+**Production URLs (Cloudflare):** see [CLOUDFLARE.md](./CLOUDFLARE.md) — public paths under `demo.solspace.com/freeform-headless/nuxt/`.
+
 Edit `.env`:
 
 ```bash

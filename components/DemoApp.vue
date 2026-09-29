@@ -35,6 +35,7 @@ type StageLayout = "preview" | "code";
 const { defaultHandle, packageSource, hasGraphqlToken } = useDemoConfig();
 const config = useRuntimeConfig();
 const configuredBaseUrl = String(config.public.freeformBaseUrl || "");
+const assetBase = String(config.app.baseURL || "/");
 const initialDraft = readDraftFromUrl();
 
 const handleDraft = ref(defaultHandle);
@@ -179,7 +180,7 @@ function onManifestLoaded(manifest: FreeformManifest, via: "REST" | "GraphQL") {
         <h1 class="header-brand">
           <img
             class="header-brand__icon"
-            src="/solspace-icon.png"
+            :src="`${assetBase}solspace-icon.png`"
             alt=""
             width="32"
             height="32"
