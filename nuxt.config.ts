@@ -140,6 +140,23 @@ export default defineNuxtConfig({
     resolve: {
       alias: { ...classNameAliases },
     },
+    build: {
+      cssCodeSplit: true,
+      modulePreload: { polyfill: false },
+      rollupOptions: {
+        output: {
+          manualChunks(id: string) {
+            if (
+              id.includes("node_modules/shiki") ||
+              id.includes("node_modules/@shikijs")
+            ) {
+              return "shiki";
+            }
+            return undefined;
+          },
+        },
+      },
+    },
     server: {
       port,
       strictPort: true,

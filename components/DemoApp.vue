@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, defineAsyncComponent, ref, watch } from "vue";
 import type { FreeformManifest, SubmitResponse } from "@solspace/freeform-core";
 import {
   type ColorScheme,
@@ -21,6 +21,10 @@ import {
   writeStoredColorScheme,
   writeStoredThemeSkin,
 } from "../utils/themePrefs";
+
+const CodePreviewPanel = defineAsyncComponent(
+  () => import("./CodePreviewPanel.vue"),
+);
 
 const graphqlFetch = withFakerResolvedFetch(rawGraphqlFetch);
 
