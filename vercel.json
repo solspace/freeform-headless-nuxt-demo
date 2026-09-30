@@ -1,0 +1,24 @@
+{
+  "rewrites": [
+    {
+      "source": "/_nuxt/:path*",
+      "destination": "/freeform-headless/nuxt/_nuxt/:path*"
+    },
+    {
+      "source": "/favicon.ico",
+      "destination": "/freeform-headless/nuxt/favicon.ico"
+    },
+    {
+      "source": "/solspace-icon.png",
+      "destination": "/freeform-headless/nuxt/solspace-icon.png"
+    },
+    {
+      "source": "/apple-touch-icon.png",
+      "destination": "/freeform-headless/nuxt/apple-touch-icon.png"
+    },
+    {
+      "source": "/",
+      "destination": "/freeform-headless/nuxt/"
+    }
+  ]
+}
